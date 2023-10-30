@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "github.com/korvised/ilog-shop";
+
+message FindItemsInIdsReq {
+  repeated int32 ids = 1;
+}
+
+message FindItemsInIdsRes {
+  repeated Item items = 1;
+}
+
+message Item {
+  string id = 1;
+  string title = 2;
+  double price = 3;
+  int32 damage = 4;
+  string imageUrl = 5;
+}
+
+service ItemGrpcService {
+  rpc FindItemInIds(FindItemsInIdsReq) returns (FindItemsInIdsRes);
+}
