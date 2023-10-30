@@ -1,4 +1,4 @@
-package playerHanders
+package playerHandlers
 
 import (
 	"github.com/korvised/ilog-shop/config"

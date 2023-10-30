@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/pkg/database"
+	"github.com/korvised/ilog-shop/server"
 	"log"
 	"os"
 )
@@ -24,4 +25,6 @@ func main() {
 	defer db.Disconnect(ctx)
 	log.Println(db)
 
+	// Start server
+	server.Start(ctx, &cfg, db)
 }
