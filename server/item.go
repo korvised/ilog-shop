@@ -15,8 +15,8 @@ func (s *server) itemService() {
 	_ = httpHandler
 	_ = grpcHandler
 
-	item := s.app.Group("/item_v1")
+	router := s.app.Group("/api/v1/item")
 
 	// Health check
-	_ = item
+	router.GET("/health", s.healthCheckService)
 }

@@ -83,7 +83,7 @@ func Start(c context.Context, cfg *config.Config, db *mongo.Client) {
 	case "auth":
 		s.authService()
 	case "player":
-		s.paymentService()
+		s.playerService()
 	case "item":
 		s.itemService()
 	case "inventory":
