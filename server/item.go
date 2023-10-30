@@ -18,5 +18,5 @@ func (s *server) itemService() {
 	router := s.app.Group("/api/v1/item")
 
 	// Health check
-	router.GET("/health", s.healthCheckService)
+	router.GET("", s.healthCheckService)
 }

@@ -18,5 +18,5 @@ func (s *server) paymentService() {
 	router := s.app.Group("/api/v1/payment")
 
 	// Health check
-	router.GET("/health", s.healthCheckService)
+	router.GET("", s.healthCheckService)
 }
