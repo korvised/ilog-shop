@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthGrpcServiceClient interface {
-	CredentialSearch(ctx context.Context, in *CredentialSearchReq, opts ...grpc.CallOption) (*CredentialSearchRes, error)
+	Credential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error)
 	RolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error)
 }
 
@@ -34,9 +34,9 @@ func NewAuthGrpcServiceClient(cc grpc.ClientConnInterface) AuthGrpcServiceClient
 	return &authGrpcServiceClient{cc}
 }
 
-func (c *authGrpcServiceClient) CredentialSearch(ctx context.Context, in *CredentialSearchReq, opts ...grpc.CallOption) (*CredentialSearchRes, error) {
-	out := new(CredentialSearchRes)
-	err := c.cc.Invoke(ctx, "/AuthGrpcService/CredentialSearch", in, out, opts...)
+func (c *authGrpcServiceClient) Credential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error) {
+	out := new(CredentialRes)
+	err := c.cc.Invoke(ctx, "/AuthGrpcService/Credential", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *authGrpcServiceClient) RolesCount(ctx context.Context, in *RolesCountRe
 // All implementations must embed UnimplementedAuthGrpcServiceServer
 // for forward compatibility
 type AuthGrpcServiceServer interface {
-	CredentialSearch(context.Context, *CredentialSearchReq) (*CredentialSearchRes, error)
+	Credential(context.Context, *CredentialReq) (*CredentialRes, error)
 	RolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error)
 	mustEmbedUnimplementedAuthGrpcServiceServer()
 }
@@ -65,8 +65,8 @@ type AuthGrpcServiceServer interface {
 type UnimplementedAuthGrpcServiceServer struct {
 }
 
-func (UnimplementedAuthGrpcServiceServer) CredentialSearch(context.Context, *CredentialSearchReq) (*CredentialSearchRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredentialSearch not implemented")
+func (UnimplementedAuthGrpcServiceServer) Credential(context.Context, *CredentialReq) (*CredentialRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Credential not implemented")
 }
 func (UnimplementedAuthGrpcServiceServer) RolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RolesCount not implemented")
@@ -84,20 +84,20 @@ func RegisterAuthGrpcServiceServer(s grpc.ServiceRegistrar, srv AuthGrpcServiceS
 	s.RegisterService(&AuthGrpcService_ServiceDesc, srv)
 }
 
-func _AuthGrpcService_CredentialSearch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredentialSearchReq)
+func _AuthGrpcService_Credential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CredentialReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthGrpcServiceServer).CredentialSearch(ctx, in)
+		return srv.(AuthGrpcServiceServer).Credential(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthGrpcService/CredentialSearch",
+		FullMethod: "/AuthGrpcService/Credential",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthGrpcServiceServer).CredentialSearch(ctx, req.(*CredentialSearchReq))
+		return srv.(AuthGrpcServiceServer).Credential(ctx, req.(*CredentialReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,8 +128,8 @@ var AuthGrpcService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthGrpcServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CredentialSearch",
-			Handler:    _AuthGrpcService_CredentialSearch_Handler,
+			MethodName: "Credential",
+			Handler:    _AuthGrpcService_Credential_Handler,
 		},
 		{
 			MethodName: "RolesCount",

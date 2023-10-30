@@ -5,11 +5,11 @@ syntax = "proto3";
 option go_package = "github.com/korvised/ilog-shop";
 
 // Structure
-message CredentialSearchReq {
+message CredentialReq {
   string accessToken = 1;
 }
 
-message CredentialSearchRes {
+message CredentialRes {
   bool isValid = 1;
 }
 
@@ -21,6 +21,6 @@ message RolesCountRes {
 
 // Methods
 service AuthGrpcService {
-  rpc CredentialSearch(CredentialSearchReq) returns (CredentialSearchRes);
+  rpc Credential(CredentialReq) returns (CredentialRes);
   rpc RolesCount(RolesCountReq) returns (RolesCountRes);
 }
