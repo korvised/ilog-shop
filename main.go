@@ -21,7 +21,7 @@ func main() {
 	}())
 
 	// Initialize database connection
-	db := database.DbConn(ctx, &cfg.Db)
+	db := database.DbConn(ctx, &cfg)
 	defer db.Disconnect(ctx)
 	log.Println(db)
 

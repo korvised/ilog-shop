@@ -1,4 +1,4 @@
-### Open in bash command line
+# Open in bash command line
 
 ## Generate gRPC code in auth module
 ```shell

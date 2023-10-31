@@ -13,17 +13,15 @@ func Debug(obj any) {
 }
 
 func LocalTime() time.Time {
-	loc, _ := time.LoadLocation("asia/Bangkok")
+	loc, _ := time.LoadLocation("Asia/Bangkok")
 	return time.Now().In(loc)
 }
 
-func ConvertStringToTime(t string) time.Time {
-	layout := "2006-01-02T15:04:05.999 -0700 MST"
+func ConvertStringTimeToTime(t string) time.Time {
+	layout := "2006-01-02 15:04:05.999 -0700 MST"
 	result, err := time.Parse(layout, t)
 	if err != nil {
-		log.Printf("Error when convert string to time: %v", err)
+		log.Printf("Error: Parse time failed: %s", err.Error())
 	}
-
-	loc, _ := time.LoadLocation("Asia/Bangkok")
-	return result.In(loc)
+	return result
 }

@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-func DbConn(c context.Context, cfg *config.Db) *mongo.Client {
+func DbConn(c context.Context, cfg *config.Config) *mongo.Client {
 	ctx, cancel := context.WithTimeout(c, 10*time.Second)
 	defer cancel()
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Url))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(cfg.Db.Url))
 	if err != nil {
 		log.Fatalf("Error: connecting to mongodb: %s \n", err.Error())
 	}
