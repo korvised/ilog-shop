@@ -12,8 +12,16 @@ func Debug(obj any) {
 	fmt.Println(string(raw))
 }
 
+func LoadLocation() *time.Location {
+	loc, err := time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		log.Printf("Error: load location failed: %s", err.Error())
+	}
+	return loc
+}
+
 func LocalTime() time.Time {
-	loc, _ := time.LoadLocation("Asia/Bangkok")
+	loc := LoadLocation()
 	return time.Now().In(loc)
 }
 

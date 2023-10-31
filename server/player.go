@@ -26,12 +26,15 @@ func (s *server) playerService() {
 		grpcServer.Serve(lis)
 	}()
 
-	_ = httpHandler
-	_ = grpcHandler
 	_ = queueHandler
 
 	router := s.app.Group("/api/v1/player")
 
 	// Health check
 	router.GET("", s.healthCheckService)
+
+	router.POST("/register", httpHandler.Register)
+	router.POST("/add-money", httpHandler.AddPlayerMoney)
+	router.GET("/profile/:player_id", httpHandler.GetPlayerProfile)
+	router.GET("/account/:player_id", httpHandler.GetPlayerSavingAccount)
 }

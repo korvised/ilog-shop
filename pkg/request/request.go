@@ -19,11 +19,13 @@ type (
 
 func (c *contextWrapper) Bind(data any) error {
 	if err := c.context.Bind(data); err != nil {
-		log.Printf("Error: binding data: %v", err)
+		log.Printf("Error: binding data: %v \n", err)
+		return err
 	}
 
 	if err := c.validator.Struct(data); err != nil {
-		log.Fatalf("Error: validating data: %v", err)
+		log.Printf("Error: validating data: %v \n", err)
+		return err
 	}
 
 	return nil
