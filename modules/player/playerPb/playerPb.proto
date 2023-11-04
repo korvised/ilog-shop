@@ -7,7 +7,7 @@ message PlayerProfile {
   string email = 2;
   string username = 3;
   string password = 4;
-  string roleCode = 5;
+  int32 roleCode = 5;
   string created_at = 6;
   string updated_at = 7;
 }

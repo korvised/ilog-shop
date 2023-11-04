@@ -23,7 +23,7 @@ func (g *playerGrpcHandler) CredentialSearch(
 	ctx context.Context,
 	req *playerPb.CredentialSearchReq,
 ) (*playerPb.PlayerProfile, error) {
-	return nil, nil
+	return g.playerUsecase.GetPlayerCredential(ctx, req.Email, req.Password)
 }
 
 func (g *playerGrpcHandler) FindOnePlayerProfileToRefresh(

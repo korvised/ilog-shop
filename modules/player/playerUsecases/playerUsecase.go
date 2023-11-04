@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/korvised/ilog-shop/modules/player"
+	playerPb "github.com/korvised/ilog-shop/modules/player/playerPb"
 	"github.com/korvised/ilog-shop/modules/player/playerRepositories"
 	"github.com/korvised/ilog-shop/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -15,6 +16,7 @@ type (
 		CreatePlayer(c context.Context, req *player.CreatePlayerReq) (*player.PlayerProfile, error)
 		GetPlayerProfile(c context.Context, playerId string) (*player.PlayerProfile, error)
 		GetPlayerSavingAccount(c context.Context, playerId string) (*player.PlayerSavingAccount, error)
+		GetPlayerCredential(c context.Context, email, password string) (*playerPb.PlayerProfile, error)
 	}
 
 	playerUsecase struct {

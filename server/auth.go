@@ -11,7 +11,7 @@ import (
 
 func (s *server) authService() {
 	repo := authRepositories.NewAuthRepository(s.db)
-	usecase := authUsecases.NewAuthUsecase(repo)
+	usecase := authUsecases.NewAuthUsecase(s.cfg, repo)
 	httpHandler := authHandlers.NewAuthHttpHandler(s.cfg, usecase)
 	grpcHandler := authHandlers.NewAuthGrpcHandler(usecase)
 
@@ -31,4 +31,6 @@ func (s *server) authService() {
 
 	// Health check
 	router.GET("", s.healthCheckService)
+
+	router.POST("/login", httpHandler.Login)
 }
