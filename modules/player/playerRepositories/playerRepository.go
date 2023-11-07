@@ -18,6 +18,7 @@ type (
 		FindOnePlayerProfile(c context.Context, playerID string) (*player.PlayerProfileBson, error)
 		FindOnePlayerSavingAccount(c context.Context, playerID string) (*player.PlayerSavingAccount, error)
 		FindOnePlayerCredential(c context.Context, email string) (*player.Player, error)
+		FindOnePlayerProfileToRefresh(c context.Context, playerID string) (*player.Player, error)
 		IsUniquePlayer(c context.Context, email, username string) bool
 		InsertOnePlayer(c context.Context, req *player.Player) (primitive.ObjectID, error)
 		InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) error
@@ -170,6 +171,22 @@ func (r *playerRepository) FindOnePlayerCredential(c context.Context, email stri
 
 	if err := col.FindOne(ctx, bson.M{"email": email}).Decode(document); err != nil {
 		log.Printf("Error: FindOnePlayerCredential failed: %v \n", err)
+		return nil, errors.New("error: player not found")
+	}
+
+	return document, nil
+}
+
+func (r *playerRepository) FindOnePlayerProfileToRefresh(c context.Context, playerID string) (*player.Player, error) {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("players")
+
+	document := new(player.Player)
+	if err := col.FindOne(ctx, bson.M{"_id": utils.ConvertToObjectId(playerID)}).Decode(document); err != nil {
+		log.Printf("Error: FindOnePlayerProfileToRefresh failed: %v \n", err)
 		return nil, errors.New("error: player not found")
 	}
 

@@ -11,6 +11,10 @@ type (
 		Password string `json:"password" form:"password" validate:"required,max=32"`
 	}
 
+	PlayerLogoutReq struct {
+		AccessToken string `json:"access_token" form:"access_token" validate:"required,max=500"`
+	}
+
 	RefreshTokenReq struct {
 		RefreshToken string `json:"refresh_token" form:"refresh_token" validate:"required,max=500"`
 	}

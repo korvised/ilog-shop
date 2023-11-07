@@ -21,4 +21,11 @@ type (
 		Title string             `json:"title" bson:"title"`
 		Code  int                `json:"code" bson:"code"`
 	}
+
+	UpdateCredentialReq struct {
+		ID           string    `json:"_id" bson:"_id,omitempty"`
+		AccessToken  string    `bson:"access_token"`
+		RefreshToken string    `bson:"refresh_token"`
+		UpdatedAt    time.Time `bson:"updated_at"`
+	}
 )

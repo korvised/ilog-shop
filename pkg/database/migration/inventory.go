@@ -9,17 +9,17 @@ import (
 	"log"
 )
 
-func inventoryDbConn(pctx context.Context, cfg *config.Config) *mongo.Database {
-	return database.DbConn(pctx, cfg).Database("inventory_db")
+func inventoryDbConn(ctx context.Context, cfg *config.Config) *mongo.Database {
+	return database.DbConn(ctx, cfg).Database("inventory_db")
 }
 
-func InventoryMigrate(pctx context.Context, cfg *config.Config) {
-	db := inventoryDbConn(pctx, cfg)
-	defer db.Client().Disconnect(pctx)
+func InventoryMigrate(ctx context.Context, cfg *config.Config) {
+	db := inventoryDbConn(ctx, cfg)
+	defer db.Client().Disconnect(ctx)
 
 	col := db.Collection("players_inventory")
 
-	indexs, _ := col.Indexes().CreateMany(pctx, []mongo.IndexModel{
+	indexs, _ := col.Indexes().CreateMany(ctx, []mongo.IndexModel{
 		{Keys: bson.D{{"player_id", 1}, {"item_id", 1}}},
 	})
 	for _, index := range indexs {
@@ -28,7 +28,7 @@ func InventoryMigrate(pctx context.Context, cfg *config.Config) {
 
 	col = db.Collection("players_inventory_queue")
 
-	results, err := col.InsertOne(pctx, bson.M{"offset": -1}, nil)
+	results, err := col.InsertOne(ctx, bson.M{"offset": -1}, nil)
 	if err != nil {
 		panic(err)
 	}

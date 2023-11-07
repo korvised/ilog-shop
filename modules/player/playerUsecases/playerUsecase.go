@@ -17,6 +17,7 @@ type (
 		GetPlayerProfile(c context.Context, playerId string) (*player.PlayerProfile, error)
 		GetPlayerSavingAccount(c context.Context, playerId string) (*player.PlayerSavingAccount, error)
 		GetPlayerCredential(c context.Context, email, password string) (*playerPb.PlayerProfile, error)
+		GetPlayerProfileToRefresh(c context.Context, playerID string) (*playerPb.PlayerProfile, error)
 	}
 
 	playerUsecase struct {
@@ -47,7 +48,7 @@ func (u *playerUsecase) CreatePlayer(c context.Context, req *player.CreatePlayer
 		CreatedAt: utils.LocalTime(),
 		UpdatedAt: utils.LocalTime(),
 		PlayerRoles: []player.PlayerRole{
-			{RoleTitle: "player", RoleCode: 0},
+			{RoleTitle: "player", RoleCode: 1},
 		},
 	}
 	playerId, err := u.playerRepository.InsertOnePlayer(c, payload)

@@ -18,6 +18,6 @@ func NewPaymentRepository(db *mongo.Client) PaymentRepositoryService {
 	return &paymentRepository{db}
 }
 
-func (r *paymentRepository) paymentDbConn(c context.Context) *mongo.Database {
+func (r *paymentRepository) paymentDbConn(_ context.Context) *mongo.Database {
 	return r.db.Database("payment_db")
 }

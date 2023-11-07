@@ -30,7 +30,7 @@ func (g *playerGrpcHandler) FindOnePlayerProfileToRefresh(
 	ctx context.Context,
 	req *playerPb.FindOnePlayerProfileToRefreshReq,
 ) (*playerPb.PlayerProfile, error) {
-	return nil, nil
+	return g.playerUsecase.GetPlayerProfileToRefresh(ctx, req.PlayerId)
 }
 
 func (g *playerGrpcHandler) GetPlayerSavingAccount(

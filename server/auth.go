@@ -33,4 +33,6 @@ func (s *server) authService() {
 	router.GET("", s.healthCheckService)
 
 	router.POST("/login", httpHandler.Login)
+	router.POST("/logout", httpHandler.Logout)
+	router.POST("/refresh-token", httpHandler.RefreshToken)
 }
