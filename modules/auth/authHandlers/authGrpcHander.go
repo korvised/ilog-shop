@@ -19,10 +19,10 @@ func NewAuthGrpcHandler(authUsecase authUsecases.AuthUsecaseService) *authGrpcHa
 	}
 }
 
-func (g *authGrpcHandler) CredentialSearch(ctx context.Context, req *authPb.CredentialReq) (*authPb.CredentialRes, error) {
-	return nil, nil
+func (g *authGrpcHandler) GetCredential(ctx context.Context, req *authPb.CredentialReq) (*authPb.CredentialRes, error) {
+	return g.authUsecase.GetCredentialByAccessToken(ctx, req)
 }
 
-func (g *authGrpcHandler) RolesCount(ctx context.Context, req *authPb.RolesCountReq) (*authPb.RolesCountRes, error) {
-	return nil, nil
+func (g *authGrpcHandler) GetRolesCount(ctx context.Context, _ *authPb.RolesCountReq) (*authPb.RolesCountRes, error) {
+	return g.authUsecase.GetRoleCount(ctx)
 }

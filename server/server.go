@@ -27,10 +27,10 @@ type (
 	}
 )
 
-func newMiddleware(cgf *config.Config) middlewareHandlers.MiddlewareHandlerService {
-	repo := middlewareRepositories.NewMiddlewareRepository()
-	usecase := middlewareUsecases.NewMiddlewareUsecase(repo)
-	return middlewareHandlers.NewMiddlewareHandler(cgf, usecase)
+func newMiddleware(cfg *config.Config) middlewareHandlers.MiddlewareHandlerService {
+	repo := middlewareRepositories.NewMiddlewareRepository(cfg)
+	usecase := middlewareUsecases.NewMiddlewareUsecase(cfg, repo)
+	return middlewareHandlers.NewMiddlewareHandler(cfg, usecase)
 }
 
 func (s *server) graceFullShutdown(c context.Context, quit <-chan os.Signal) {

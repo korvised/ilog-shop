@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthGrpcServiceClient interface {
-	Credential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error)
-	RolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error)
+	GetCredential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error)
+	GetRolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error)
 }
 
 type authGrpcServiceClient struct {
@@ -34,18 +34,18 @@ func NewAuthGrpcServiceClient(cc grpc.ClientConnInterface) AuthGrpcServiceClient
 	return &authGrpcServiceClient{cc}
 }
 
-func (c *authGrpcServiceClient) Credential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error) {
+func (c *authGrpcServiceClient) GetCredential(ctx context.Context, in *CredentialReq, opts ...grpc.CallOption) (*CredentialRes, error) {
 	out := new(CredentialRes)
-	err := c.cc.Invoke(ctx, "/AuthGrpcService/Credential", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/AuthGrpcService/GetCredential", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authGrpcServiceClient) RolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error) {
+func (c *authGrpcServiceClient) GetRolesCount(ctx context.Context, in *RolesCountReq, opts ...grpc.CallOption) (*RolesCountRes, error) {
 	out := new(RolesCountRes)
-	err := c.cc.Invoke(ctx, "/AuthGrpcService/RolesCount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/AuthGrpcService/GetRolesCount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (c *authGrpcServiceClient) RolesCount(ctx context.Context, in *RolesCountRe
 // All implementations must embed UnimplementedAuthGrpcServiceServer
 // for forward compatibility
 type AuthGrpcServiceServer interface {
-	Credential(context.Context, *CredentialReq) (*CredentialRes, error)
-	RolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error)
+	GetCredential(context.Context, *CredentialReq) (*CredentialRes, error)
+	GetRolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error)
 	mustEmbedUnimplementedAuthGrpcServiceServer()
 }
 
@@ -65,11 +65,11 @@ type AuthGrpcServiceServer interface {
 type UnimplementedAuthGrpcServiceServer struct {
 }
 
-func (UnimplementedAuthGrpcServiceServer) Credential(context.Context, *CredentialReq) (*CredentialRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Credential not implemented")
+func (UnimplementedAuthGrpcServiceServer) GetCredential(context.Context, *CredentialReq) (*CredentialRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCredential not implemented")
 }
-func (UnimplementedAuthGrpcServiceServer) RolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RolesCount not implemented")
+func (UnimplementedAuthGrpcServiceServer) GetRolesCount(context.Context, *RolesCountReq) (*RolesCountRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRolesCount not implemented")
 }
 func (UnimplementedAuthGrpcServiceServer) mustEmbedUnimplementedAuthGrpcServiceServer() {}
 
@@ -84,38 +84,38 @@ func RegisterAuthGrpcServiceServer(s grpc.ServiceRegistrar, srv AuthGrpcServiceS
 	s.RegisterService(&AuthGrpcService_ServiceDesc, srv)
 }
 
-func _AuthGrpcService_Credential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AuthGrpcService_GetCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CredentialReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthGrpcServiceServer).Credential(ctx, in)
+		return srv.(AuthGrpcServiceServer).GetCredential(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthGrpcService/Credential",
+		FullMethod: "/AuthGrpcService/GetCredential",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthGrpcServiceServer).Credential(ctx, req.(*CredentialReq))
+		return srv.(AuthGrpcServiceServer).GetCredential(ctx, req.(*CredentialReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthGrpcService_RolesCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AuthGrpcService_GetRolesCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RolesCountReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthGrpcServiceServer).RolesCount(ctx, in)
+		return srv.(AuthGrpcServiceServer).GetRolesCount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/AuthGrpcService/RolesCount",
+		FullMethod: "/AuthGrpcService/GetRolesCount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthGrpcServiceServer).RolesCount(ctx, req.(*RolesCountReq))
+		return srv.(AuthGrpcServiceServer).GetRolesCount(ctx, req.(*RolesCountReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,12 +128,12 @@ var AuthGrpcService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthGrpcServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Credential",
-			Handler:    _AuthGrpcService_Credential_Handler,
+			MethodName: "GetCredential",
+			Handler:    _AuthGrpcService_GetCredential_Handler,
 		},
 		{
-			MethodName: "RolesCount",
-			Handler:    _AuthGrpcService_RolesCount_Handler,
+			MethodName: "GetRolesCount",
+			Handler:    _AuthGrpcService_GetRolesCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

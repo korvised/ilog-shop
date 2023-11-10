@@ -10,7 +10,7 @@ import (
 )
 
 func (s *server) authService() {
-	repo := authRepositories.NewAuthRepository(s.db)
+	repo := authRepositories.NewAuthRepository(s.db, s.cfg)
 	usecase := authUsecases.NewAuthUsecase(s.cfg, repo)
 	httpHandler := authHandlers.NewAuthHttpHandler(s.cfg, usecase)
 	grpcHandler := authHandlers.NewAuthGrpcHandler(usecase)
@@ -25,14 +25,12 @@ func (s *server) authService() {
 		grpcServer.Serve(lis)
 	}()
 
-	_ = httpHandler
-
 	router := s.app.Group("/api/v1/auth")
 
 	// Health check
 	router.GET("", s.healthCheckService)
 
 	router.POST("/login", httpHandler.Login)
-	router.POST("/logout", httpHandler.Logout)
-	router.POST("/refresh-token", httpHandler.RefreshToken)
+	router.POST("/logout", httpHandler.Logout, s.middleware.JwtAuthorization, s.middleware.Roles(s.healthCheckService, []int{1, 0}))
+	router.POST("/refresh-token", httpHandler.RefreshToken, s.middleware.JwtAuthorization)
 }
