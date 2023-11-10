@@ -12,7 +12,7 @@ import (
 type (
 	MiddlewareHandlerService interface {
 		JwtAuthorization(next echo.HandlerFunc) echo.HandlerFunc
-		Roles(next echo.HandlerFunc, expectedRoles []int) echo.HandlerFunc
+		Roles(expectedRoles []int) echo.MiddlewareFunc
 	}
 
 	middlewareHandler struct {
@@ -48,13 +48,15 @@ func (h *middlewareHandler) JwtAuthorization(next echo.HandlerFunc) echo.Handler
 	}
 }
 
-func (h *middlewareHandler) Roles(next echo.HandlerFunc, expectedRoles []int) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		newCtx, err := h.middlewareUsecase.Roles(c, expectedRoles)
-		if err != nil {
-			return response.ErrResponse(c, http.StatusUnauthorized, err.Error())
-		}
+func (h *middlewareHandler) Roles(expectedRoles []int) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			newCtx, err := h.middlewareUsecase.Roles(c, expectedRoles)
+			if err != nil {
+				return response.ErrResponse(c, http.StatusUnauthorized, err.Error())
+			}
 
-		return next(newCtx)
+			return next(newCtx)
+		}
 	}
 }

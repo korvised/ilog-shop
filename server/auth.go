@@ -31,6 +31,6 @@ func (s *server) authService() {
 	router.GET("", s.healthCheckService)
 
 	router.POST("/login", httpHandler.Login)
-	router.POST("/logout", httpHandler.Logout, s.middleware.JwtAuthorization, s.middleware.Roles(s.healthCheckService, []int{1, 0}))
+	router.POST("/logout", httpHandler.Logout, s.middleware.JwtAuthorization)
 	router.POST("/refresh-token", httpHandler.RefreshToken, s.middleware.JwtAuthorization)
 }

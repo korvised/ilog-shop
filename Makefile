@@ -1,4 +1,3 @@
-
 setup_db:
 	docker-compose -f docker-compose.db.yml up -d
 gen_auth_grpc:
