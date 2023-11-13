@@ -21,5 +21,6 @@ type (
 	}
 
 	grpcAuth struct {
+		secretKey string
 	}
 )

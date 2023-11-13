@@ -5,6 +5,7 @@ import (
 	"errors"
 	playerPb "github.com/korvised/ilog-shop/modules/player/playerPb"
 	"github.com/korvised/ilog-shop/pkg/grpcconn"
+	"github.com/korvised/ilog-shop/pkg/jwtauth"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"time"
@@ -20,6 +21,7 @@ func (r *authRepository) FindCredential(c context.Context, req *playerPb.Credent
 		return nil, errors.New("error: grpc client connection failed")
 	}
 
+	jwtauth.SetApiKeyInContext(&ctx)
 	result, err := conn.Player().CredentialSearch(ctx, req)
 	if err != nil {
 		log.Printf("Error: CredentialSearch failed: %v \n", err)
@@ -39,6 +41,7 @@ func (r *authRepository) FindOnePlayerProfileToRefresh(c context.Context, req *p
 		return nil, errors.New("error: grpc client connection failed")
 	}
 
+	jwtauth.SetApiKeyInContext(&ctx)
 	result, err := conn.Player().FindOnePlayerProfileToRefresh(ctx, req)
 	if err != nil {
 		log.Printf("Error: FindOnePlayerProfileToRefresh failed: %v \n", err)

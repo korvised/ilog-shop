@@ -7,6 +7,7 @@ import (
 	"github.com/korvised/ilog-shop/modules/middleware/middlewareHandlers"
 	"github.com/korvised/ilog-shop/modules/middleware/middlewareRepositories"
 	"github.com/korvised/ilog-shop/modules/middleware/middlewareUsecases"
+	"github.com/korvised/ilog-shop/pkg/jwtauth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -60,6 +61,8 @@ func Start(c context.Context, cfg *config.Config, db *mongo.Client) {
 		cfg:        cfg,
 		middleware: newMiddleware(cfg),
 	}
+
+	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)
 
 	// Basic middleware
 	// Request TimeOut

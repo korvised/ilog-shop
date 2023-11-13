@@ -6,6 +6,7 @@ import (
 	"github.com/korvised/ilog-shop/config"
 	authPb "github.com/korvised/ilog-shop/modules/auth/authPb"
 	"github.com/korvised/ilog-shop/pkg/grpcconn"
+	"github.com/korvised/ilog-shop/pkg/jwtauth"
 	"log"
 	"time"
 )
@@ -35,6 +36,7 @@ func (r *middlewareRepository) FindOneCredential(c context.Context, accessToken 
 		return errors.New("error: gRPC client connection failed")
 	}
 
+	jwtauth.SetApiKeyInContext(&c)
 	result, err := conn.Auth().GetCredential(ctx, &authPb.CredentialReq{
 		AccessToken: accessToken,
 	})
@@ -61,6 +63,7 @@ func (r *middlewareRepository) FineRoleCount(c context.Context) (int64, error) {
 		return -1, errors.New("error: gRPC client connection failed")
 	}
 
+	jwtauth.SetApiKeyInContext(&ctx)
 	result, err := conn.Auth().GetRolesCount(ctx, &authPb.RolesCountReq{})
 	if err != nil {
 		log.Printf("Error: GetCredential: %v \n", err)

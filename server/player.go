@@ -34,7 +34,7 @@ func (s *server) playerService() {
 	router.GET("", s.healthCheckService)
 
 	router.POST("/register", httpHandler.Register)
-	router.POST("/add-money", httpHandler.AddPlayerMoney)
-	router.GET("/profile/:player_id", httpHandler.GetPlayerProfile)
-	router.GET("/account/:player_id", httpHandler.GetPlayerSavingAccount)
+	router.POST("/add-money", httpHandler.AddPlayerMoney, s.middleware.Authorization)
+	router.GET("/profile/:player_id", httpHandler.GetPlayerProfile, s.middleware.Authorization)
+	router.GET("/saving-account", httpHandler.GetPlayerSavingAccount, s.middleware.Authorization)
 }

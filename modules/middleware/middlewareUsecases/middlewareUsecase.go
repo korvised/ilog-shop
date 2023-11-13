@@ -3,16 +3,16 @@ package middlewareUsecases
 import (
 	"errors"
 	"github.com/korvised/ilog-shop/config"
+	"github.com/korvised/ilog-shop/modules/middleware"
 	"github.com/korvised/ilog-shop/modules/middleware/middlewareRepositories"
 	"github.com/korvised/ilog-shop/pkg/jwtauth"
-	"github.com/korvised/ilog-shop/pkg/rbac"
 	"github.com/labstack/echo/v4"
 )
 
 type (
 	MiddlewareUsecaseService interface {
 		JwtAuthorization(c echo.Context, accessToken string) (echo.Context, error)
-		Roles(c echo.Context, expectedRoles []int) (echo.Context, error)
+		Roles(c echo.Context, expectedRoles []int) error
 	}
 
 	middlewareUsecase struct {
@@ -37,29 +37,20 @@ func (u *middlewareUsecase) JwtAuthorization(c echo.Context, accessToken string)
 		return nil, err
 	}
 
-	c.Set("player_id", claims.PlayerID)
-	c.Set("role_code", claims.RoleCode)
+	c.Set(middleware.PlayerID, claims.PlayerID)
+	c.Set(middleware.RoleCode, claims.RoleCode)
 
 	return c, nil
 }
 
-func (u *middlewareUsecase) Roles(c echo.Context, expectedRoles []int) (echo.Context, error) {
-	ctx := c.Request().Context()
+func (u *middlewareUsecase) Roles(c echo.Context, allowedRoles []int) error {
+	playerRoleCode := c.Get(middleware.RoleCode).(int)
 
-	playerRoleCode := c.Get("role_code").(int)
-
-	roleCount, err := u.middlewareRepository.FineRoleCount(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	playerRole := rbac.IntToBinary(playerRoleCode, int(roleCount))
-
-	for i := 0; i < int(roleCount); i++ {
-		if playerRole[i]&expectedRoles[i] == 1 {
-			return c, nil
+	for _, role := range allowedRoles {
+		if playerRoleCode == role {
+			return nil
 		}
 	}
 
-	return nil, errors.New("error: permission denied")
+	return errors.New("error: permission denied")
 }
