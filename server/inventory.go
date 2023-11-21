@@ -23,7 +23,7 @@ func (s *server) inventoryService() {
 		inventoryPb.RegisterInventoryGrpcServiceServer(grpcServer, grpcHandler)
 
 		log.Printf("Start inventory gRPC server: %s \n", s.cfg.Grpc.InventoryUrl)
-		grpcServer.Serve(lis)
+		_ = grpcServer.Serve(lis)
 	}()
 
 	_ = httpHandler

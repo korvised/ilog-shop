@@ -27,12 +27,12 @@ func (g *grpcAuth) unaryAuthorization(ctx context.Context, req any, _ *grpc.Unar
 		return nil, errors.New("error: authorization header invalid")
 	}
 
-	claims, err := jwtauth.ParseToken(g.secretKey, authHeader[0])
+	_, err := jwtauth.ParseToken(g.secretKey, authHeader[0])
 	if err != nil {
 		log.Printf("Error: gRPC failed to parse token: %v \n", err)
 		return nil, errors.New("error: failed to parse token")
 	}
-	log.Printf("Claims: %v \n", claims)
+	//log.Printf("Claims: %v \n", claims)
 
 	return handler(ctx, req)
 }

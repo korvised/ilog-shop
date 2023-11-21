@@ -23,7 +23,7 @@ func (s *server) playerService() {
 		playerPb.RegisterPlayerGrpcServiceServer(grpcServer, grpcHandler)
 
 		log.Printf("Start player gRPC server: %s \n", s.cfg.Grpc.PlayerUrl)
-		grpcServer.Serve(lis)
+		_ = grpcServer.Serve(lis)
 	}()
 
 	_ = queueHandler

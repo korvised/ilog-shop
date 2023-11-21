@@ -36,7 +36,7 @@ func (r *middlewareRepository) FindOneCredential(c context.Context, accessToken 
 		return errors.New("error: gRPC client connection failed")
 	}
 
-	jwtauth.SetApiKeyInContext(&c)
+	jwtauth.SetApiKeyInContext(&ctx)
 	result, err := conn.Auth().GetCredential(ctx, &authPb.CredentialReq{
 		AccessToken: accessToken,
 	})

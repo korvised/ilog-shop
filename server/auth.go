@@ -22,7 +22,7 @@ func (s *server) authService() {
 		authPb.RegisterAuthGrpcServiceServer(grpcServer, grpcHandler)
 
 		log.Printf("Start auth gRPC server: %s \n", s.cfg.Grpc.AuthUrl)
-		grpcServer.Serve(lis)
+		_ = grpcServer.Serve(lis)
 	}()
 
 	router := s.app.Group("/api/v1/auth")

@@ -22,7 +22,7 @@ func (s *server) itemService() {
 		itemPb.RegisterItemGrpcServiceServer(grpcServer, grpcHandler)
 
 		log.Printf("Start item gRPC server: %s \n", s.cfg.Grpc.ItemUrl)
-		grpcServer.Serve(lis)
+		_ = grpcServer.Serve(lis)
 	}()
 
 	_ = httpHandler
