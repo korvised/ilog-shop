@@ -21,10 +21,10 @@ import (
 
 type (
 	server struct {
-		app        *echo.Echo
-		db         *mongo.Client
-		cfg        *config.Config
-		middleware middlewareHandlers.MiddlewareHandlerService
+		app *echo.Echo
+		db  *mongo.Client
+		cfg *config.Config
+		m   middlewareHandlers.MiddlewareHandlerService
 	}
 )
 
@@ -56,10 +56,10 @@ func (s *server) httpListening() {
 
 func Start(c context.Context, cfg *config.Config, db *mongo.Client) {
 	s := &server{
-		app:        echo.New(),
-		db:         db,
-		cfg:        cfg,
-		middleware: newMiddleware(cfg),
+		app: echo.New(),
+		db:  db,
+		cfg: cfg,
+		m:   newMiddleware(cfg),
 	}
 
 	jwtauth.SetApiKey(cfg.Jwt.ApiSecretKey)

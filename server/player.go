@@ -28,13 +28,13 @@ func (s *server) playerService() {
 
 	_ = queueHandler
 
-	router := s.app.Group("/api/v1/player")
+	router := s.app.Group("/api/v1")
 
 	// Health check
 	router.GET("", s.healthCheckService)
 
-	router.POST("/register", httpHandler.Register)
-	router.POST("/add-money", httpHandler.AddPlayerMoney, s.middleware.Authorization)
-	router.GET("/profile/:player_id", httpHandler.GetPlayerProfile, s.middleware.Authorization)
-	router.GET("/saving-account", httpHandler.GetPlayerSavingAccount, s.middleware.Authorization)
+	router.POST("/player/register", httpHandler.Register)
+	router.POST("/player/add-money", httpHandler.AddPlayerMoney, s.m.Authorization)
+	router.GET("/player/profile/:player_id", httpHandler.GetPlayerProfile, s.m.Authorization)
+	router.GET("/player/saving-account", httpHandler.GetPlayerSavingAccount, s.m.Authorization)
 }

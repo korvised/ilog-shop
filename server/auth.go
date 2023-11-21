@@ -25,12 +25,12 @@ func (s *server) authService() {
 		_ = grpcServer.Serve(lis)
 	}()
 
-	router := s.app.Group("/api/v1/auth")
+	router := s.app.Group("/api/v1")
 
 	// Health check
 	router.GET("", s.healthCheckService)
 
-	router.POST("/login", httpHandler.Login)
-	router.POST("/logout", httpHandler.Logout, s.middleware.Authorization)
-	router.POST("/refresh-token", httpHandler.RefreshToken, s.middleware.Authorization)
+	router.POST("/auth/login", httpHandler.Login)
+	router.POST("/auth/logout", httpHandler.Logout, s.m.Authorization)
+	router.POST("/auth/refresh-token", httpHandler.RefreshToken, s.m.Authorization)
 }
