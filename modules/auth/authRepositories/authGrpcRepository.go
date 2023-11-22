@@ -17,8 +17,8 @@ func (r *authRepository) FindCredential(c context.Context, req *playerPb.Credent
 
 	conn, err := grpcconn.NewGrpcClient(r.cfg.Grpc.PlayerUrl)
 	if err != nil {
-		log.Printf("Error: grpc client connection failed: %v \n", err)
-		return nil, errors.New("error: grpc client connection failed")
+		log.Printf("Error: gRPC client connection failed: %v \n", err)
+		return nil, errors.New("error: gRPC client connection failed")
 	}
 
 	jwtauth.SetApiKeyInContext(&ctx)
@@ -37,8 +37,8 @@ func (r *authRepository) FindOnePlayerProfileToRefresh(c context.Context, req *p
 
 	conn, err := grpcconn.NewGrpcClient(r.cfg.Grpc.PlayerUrl)
 	if err != nil {
-		log.Printf("Error: grpc client connection failed: %v \n", err)
-		return nil, errors.New("error: grpc client connection failed")
+		log.Printf("Error: gRPC client connection failed: %v \n", err)
+		return nil, errors.New("error: gRPC client connection failed")
 	}
 
 	jwtauth.SetApiKeyInContext(&ctx)

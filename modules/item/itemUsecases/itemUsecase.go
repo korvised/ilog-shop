@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/modules/item"
+	itemPb "github.com/korvised/ilog-shop/modules/item/itemPb"
 	"github.com/korvised/ilog-shop/modules/item/itemRepositories"
 	"github.com/korvised/ilog-shop/modules/models"
 	"github.com/korvised/ilog-shop/pkg/utils"
@@ -19,6 +20,7 @@ type (
 		CreateItem(c context.Context, req *item.CreateItemReq) (*item.ItemShowCase, error)
 		GetItem(c context.Context, itemID string) (*item.ItemShowCase, error)
 		GetItems(c context.Context, req *item.ItemSearchReq) (*models.PaginateRes, error)
+		GetItemsInIds(c context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		UpdateItem(c context.Context, itemID string, req *item.ItemUpdateReq) (*item.ItemShowCase, error)
 		UpdateItemStatus(c context.Context, itemID string, isActive bool) (*item.ItemShowCase, error)
 	}
@@ -77,7 +79,7 @@ func (u *itemUsecase) GetItems(c context.Context, req *item.ItemSearchReq) (*mod
 	opts := make([]*options.FindOptions, 0)
 
 	// Filter
-	if req.Start == "" {
+	if req.Start != "" {
 		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{"$gt", utils.ConvertToObjectId(req.Start)}}})
 	}
 
@@ -138,6 +140,40 @@ func (u *itemUsecase) GetItems(c context.Context, req *item.ItemSearchReq) (*mod
 			Start: results[len(results)-1].ID,
 		},
 	}, nil
+}
+
+func (u *itemUsecase) GetItemsInIds(c context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error) {
+	filter := bson.D{}
+
+	objIds := make([]primitive.ObjectID, 0)
+	for _, id := range req.Ids {
+		objIds = append(objIds, utils.ConvertToObjectId(id))
+	}
+
+	filter = append(filter, bson.E{Key: "_id", Value: bson.D{{"$in", objIds}}})
+	filter = append(filter, bson.E{Key: "usage_status", Value: true})
+
+	results, err := u.itemRepository.FindManyItems(c, filter, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*itemPb.Item, 0)
+	for _, obj := range results {
+		items = append(items, &itemPb.Item{
+			Id:       obj.ID,
+			Title:    obj.Title,
+			Price:    obj.Price,
+			Damage:   int32(obj.Damage),
+			ImageUrl: obj.ImageUrl,
+		})
+	}
+
+	result := &itemPb.FindItemsInIdsRes{
+		Items: items,
+	}
+
+	return result, nil
 }
 
 func (u *itemUsecase) UpdateItem(c context.Context, itemID string, req *item.ItemUpdateReq) (*item.ItemShowCase, error) {
