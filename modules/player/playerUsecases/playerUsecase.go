@@ -18,6 +18,8 @@ type (
 		GetPlayerSavingAccount(c context.Context, playerId string) (*player.PlayerSavingAccount, error)
 		GetPlayerCredential(c context.Context, email, password string) (*playerPb.PlayerProfile, error)
 		GetPlayerProfileToRefresh(c context.Context, playerID string) (*playerPb.PlayerProfile, error)
+		GetOffset(c context.Context) (int64, error)
+		UpsertOffset(c context.Context, offset int64) error
 	}
 
 	playerUsecase struct {
@@ -94,4 +96,12 @@ func (u *playerUsecase) AddPlayerMoney(c context.Context, req *player.CreatePlay
 
 func (u *playerUsecase) GetPlayerSavingAccount(c context.Context, playerId string) (*player.PlayerSavingAccount, error) {
 	return u.playerRepository.FindOnePlayerSavingAccount(c, playerId)
+}
+
+func (u *playerUsecase) GetOffset(c context.Context) (int64, error) {
+	return u.playerRepository.FindOffset(c)
+}
+
+func (u *playerUsecase) UpsertOffset(c context.Context, offset int64) error {
+	return u.playerRepository.UpsertOffset(c, offset)
 }

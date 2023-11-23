@@ -3,6 +3,7 @@ package playerRepositories
 import (
 	"context"
 	"errors"
+	"github.com/korvised/ilog-shop/modules/models"
 	"github.com/korvised/ilog-shop/modules/player"
 	"github.com/korvised/ilog-shop/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,6 +23,8 @@ type (
 		IsUniquePlayer(c context.Context, email, username string) bool
 		InsertOnePlayer(c context.Context, req *player.Player) (primitive.ObjectID, error)
 		InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) error
+		FindOffset(c context.Context) (int64, error)
+		UpsertOffset(c context.Context, offset int64) error
 	}
 
 	playerRepository struct {
@@ -191,4 +194,36 @@ func (r *playerRepository) FindOnePlayerProfileToRefresh(c context.Context, play
 	}
 
 	return document, nil
+}
+
+func (r *playerRepository) FindOffset(c context.Context) (int64, error) {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("player_transactions_queue")
+
+	result := new(models.KafkaOffset)
+	if err := col.FindOne(ctx, bson.M{}).Decode(result); err != nil {
+		log.Printf("Error: FindOffset: %v \n", err)
+		return -1, errors.New("error: player offset not found")
+	}
+
+	return result.Offset, nil
+}
+
+func (r *playerRepository) UpsertOffset(c context.Context, offset int64) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("player_transactions_queue")
+
+	_, err := col.UpdateOne(ctx, bson.M{}, bson.M{"$set": bson.M{"offset": offset}}, options.Update().SetUpsert(true))
+	if err != nil {
+		log.Printf("Error: UpsertOffset: %v \n", err)
+		return errors.New("error: upsert player offset failed")
+	}
+
+	return nil
 }

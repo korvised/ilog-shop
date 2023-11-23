@@ -18,6 +18,8 @@ import (
 type (
 	InventoryUsecaseService interface {
 		GetPlayerItems(c context.Context, playerID string, req *inventory.InventorySearchReq) (*models.PaginateRes, error)
+		GetOffset(c context.Context) (int64, error)
+		UpsertOffset(c context.Context, offset int64) error
 	}
 
 	inventoryUsecase struct {
@@ -113,4 +115,12 @@ func (u *inventoryUsecase) GetPlayerItems(c context.Context, playerID string, re
 		},
 		Next: nextPaginate,
 	}, nil
+}
+
+func (u *inventoryUsecase) GetOffset(c context.Context) (int64, error) {
+	return u.inventoryRepository.FindOffset(c)
+}
+
+func (u *inventoryUsecase) UpsertOffset(c context.Context, offset int64) error {
+	return u.inventoryRepository.UpsertOffset(c, offset)
 }
