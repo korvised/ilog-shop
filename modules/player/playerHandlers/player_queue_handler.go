@@ -64,8 +64,8 @@ func (h *playerQueueHandler) DockedPlayerMoney() {
 
 	log.Println("Start DockedPlayerMoney ...")
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 	for {
 		select {
@@ -74,7 +74,7 @@ func (h *playerQueueHandler) DockedPlayerMoney() {
 			continue
 		case msg := <-consumer.Messages():
 			if string(msg.Key) == "buy" {
-				h.playerUsecase.UpsertOffset(ctx, msg.Offset+1)
+				_ = h.playerUsecase.UpsertOffset(ctx, msg.Offset+1)
 
 				req := new(player.CreatePlayerTransactionReq)
 
@@ -86,7 +86,7 @@ func (h *playerQueueHandler) DockedPlayerMoney() {
 
 				log.Printf("DockedPlayerMoney | Topic(%s)| Offset(%d) Message(%s) \n", msg.Topic, msg.Offset, string(msg.Value))
 			}
-		case <-sigchan:
+		case <-sigChan:
 			log.Println("Stop DockedPlayerMoney...")
 			return
 		}
@@ -120,10 +120,12 @@ func (h *playerQueueHandler) RollbackPlayerTransaction() {
 
 				req := new(player.RollbackPlayerTransactionReq)
 				if err = queue.DecodeMessage(req, msg.Value); err != nil {
+					log.Printf("Error: DecodeMessage: %v \n", err)
 					continue
 				}
 
 				if err = h.playerUsecase.RollbackPlayerTransaction(ctx, req); err != nil {
+					log.Printf("Error: RollbackPlayerTransaction: %v \n", err)
 					continue
 				}
 

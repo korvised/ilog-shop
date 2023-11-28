@@ -156,21 +156,16 @@ func (r *playerRepository) FindOnePlayerSavingAccount(c context.Context, playerI
 	cursors, err := col.Aggregate(ctx, filter)
 	if err != nil {
 		log.Printf("Error: FindOnePlayerSavingAccount: %v \n", err)
-		//return nil, errors.New("error: find player saving account failed")
-		return nil, err
+		return nil, errors.New("error: find player saving account failed")
 	}
 
 	result := new(player.PlayerSavingAccount)
 	for cursors.Next(ctx) {
 		if err = cursors.Decode(result); err != nil {
 			log.Printf("Error: Decode FindOnePlayerSavingAccount: %v \n", err)
-			//return nil, errors.New("error: find player saving account failed")
-			return nil, err
+			return nil, errors.New("error: find player saving account failed")
 		}
-
 	}
-
-	fmt.Println("result", result)
 
 	return result, nil
 }

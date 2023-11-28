@@ -24,7 +24,7 @@ func (r *paymentRepository) DockedPlayerMoney(_ context.Context, req *player.Cre
 		"buy",
 		reqInBytes,
 	); err != nil {
-		log.Printf("Error: DockedPlayerMoney: %s\n", err.Error())
+		log.Printf("Payment Error: DockedPlayerMoney: %s\n", err.Error())
 		return errors.New("error: docked player money failed")
 	}
 
@@ -36,9 +36,11 @@ func (r *paymentRepository) DockedPlayerMoney(_ context.Context, req *player.Cre
 func (r *paymentRepository) RollbackTransaction(_ context.Context, req *player.RollbackPlayerTransactionReq) error {
 	reqInBytes, err := json.Marshal(req)
 	if err != nil {
-		log.Printf("Error: RollbackTransaction: %s\n", err.Error())
+		log.Printf("Payment Error: RollbackTransaction: %s\n", err.Error())
 		return errors.New("error: rollback player money failed")
 	}
+
+	log.Printf("Payment Info: RollbackTransaction: %s\n", string(reqInBytes))
 
 	if err = queue.PushMessageWithKeyToQueue(
 		[]string{r.cfg.Kafka.Url},

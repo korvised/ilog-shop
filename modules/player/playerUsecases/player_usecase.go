@@ -109,5 +109,5 @@ func (u *playerUsecase) UpsertOffset(c context.Context, offset int64) error {
 }
 
 func (u *playerUsecase) RollbackPlayerTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error {
-	return nil
+	return u.playerRepository.DeleteOnePlayerTransaction(c, req.TransactionID)
 }

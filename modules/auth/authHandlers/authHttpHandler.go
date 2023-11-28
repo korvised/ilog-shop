@@ -5,10 +5,12 @@ import (
 	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/modules/auth"
 	"github.com/korvised/ilog-shop/modules/auth/authUsecases"
+	"github.com/korvised/ilog-shop/modules/middleware"
 	"github.com/korvised/ilog-shop/pkg/request"
 	"github.com/korvised/ilog-shop/pkg/response"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strings"
 )
 
 type (
@@ -49,11 +51,11 @@ func (h *authHttpHandler) Login(c echo.Context) error {
 func (h *authHttpHandler) Logout(c echo.Context) error {
 	ctx := context.Background()
 
-	wrapper := request.ContextWrapper(c)
-	req := new(auth.PlayerLogoutReq)
+	authorization := c.Request().Header.Get(middleware.Authorization)
+	authorizationParts := strings.Split(authorization, " ")
 
-	if err := wrapper.Bind(req); err != nil {
-		return response.ErrResponse(c, http.StatusBadRequest, err.Error())
+	req := &auth.PlayerLogoutReq{
+		AccessToken: authorizationParts[1],
 	}
 
 	err := h.authUsecase.Logout(ctx, req)

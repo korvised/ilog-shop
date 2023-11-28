@@ -10,11 +10,10 @@ import (
 )
 
 func (u *playerUsecase) DockedPlayerMoneyRes(c context.Context, req *player.CreatePlayerTransactionReq) {
-	// Get saving account
+	// Get a saving account
 	savingAccount, err := u.playerRepository.FindOnePlayerSavingAccount(c, req.PlayerID)
 	if err != nil {
-		log.Printf("Error: DockedPlayerMoneyRes: %s\n", err)
-		u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
+		_ = u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
 			InventoryID:   "",
 			TransactionID: "",
 			PlayerID:      req.PlayerID,
@@ -27,7 +26,7 @@ func (u *playerUsecase) DockedPlayerMoneyRes(c context.Context, req *player.Crea
 
 	if savingAccount.Balance < math.Abs(req.Amount) {
 		log.Printf("Error: DockedPlayerMoneyRes failed: %s", "not enough money")
-		u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
+		_ = u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
 			InventoryID:   "",
 			TransactionID: "",
 			PlayerID:      req.PlayerID,
@@ -45,7 +44,7 @@ func (u *playerUsecase) DockedPlayerMoneyRes(c context.Context, req *player.Crea
 		CreatedAt: utils.LocalTime(),
 	})
 	if err != nil {
-		u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
+		_ = u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
 			InventoryID:   "",
 			TransactionID: "",
 			PlayerID:      req.PlayerID,
@@ -56,7 +55,7 @@ func (u *playerUsecase) DockedPlayerMoneyRes(c context.Context, req *player.Crea
 		return
 	}
 
-	u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
+	_ = u.playerRepository.DockedPlayerMoneyRes(c, &payment.PaymentTransferRes{
 		InventoryID:   "",
 		TransactionID: transactionID.Hex(),
 		PlayerID:      req.PlayerID,
