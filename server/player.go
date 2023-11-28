@@ -10,11 +10,15 @@ import (
 )
 
 func (s *server) playerService() {
-	repo := playerRepositories.NewPlayerRepository(s.db)
+	repo := playerRepositories.NewPlayerRepository(s.db, s.cfg)
 	usecase := playerUsecases.NewPlayerUsecase(repo)
 	httpHandler := playerHandlers.NewPlayerHttpHandler(s.cfg, usecase)
 	grpcHandler := playerHandlers.NewPlayerGrpcHandler(usecase)
 	queueHandler := playerHandlers.NewPlayerQueueHandler(s.cfg, usecase)
+
+	// Kafka
+	go queueHandler.DockedPlayerMoney()
+	go queueHandler.RollbackPlayerTransaction()
 
 	// gRPC
 	go func() {
@@ -25,8 +29,6 @@ func (s *server) playerService() {
 		log.Printf("Start player gRPC server: %s \n", s.cfg.Grpc.PlayerUrl)
 		_ = grpcServer.Serve(lis)
 	}()
-
-	_ = queueHandler
 
 	router := s.app.Group("/api/v1")
 

@@ -20,6 +20,8 @@ type (
 		GetPlayerProfileToRefresh(c context.Context, playerID string) (*playerPb.PlayerProfile, error)
 		GetOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
+		DockedPlayerMoneyRes(c context.Context, req *player.CreatePlayerTransactionReq)
+		RollbackPlayerTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error
 	}
 
 	playerUsecase struct {
@@ -87,7 +89,7 @@ func (u *playerUsecase) AddPlayerMoney(c context.Context, req *player.CreatePlay
 		CreatedAt: utils.LocalTime(),
 	}
 
-	if err := u.playerRepository.InsertOnePlayerTransaction(c, payload); err != nil {
+	if _, err := u.playerRepository.InsertOnePlayerTransaction(c, payload); err != nil {
 		return nil, err
 	}
 
@@ -104,4 +106,8 @@ func (u *playerUsecase) GetOffset(c context.Context) (int64, error) {
 
 func (u *playerUsecase) UpsertOffset(c context.Context, offset int64) error {
 	return u.playerRepository.UpsertOffset(c, offset)
+}
+
+func (u *playerUsecase) RollbackPlayerTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error {
+	return nil
 }

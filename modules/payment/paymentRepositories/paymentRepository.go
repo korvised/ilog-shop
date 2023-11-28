@@ -6,6 +6,7 @@ import (
 	"github.com/korvised/ilog-shop/config"
 	itemPb "github.com/korvised/ilog-shop/modules/item/itemPb"
 	"github.com/korvised/ilog-shop/modules/models"
+	"github.com/korvised/ilog-shop/modules/player"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,6 +19,8 @@ type (
 		FindItemInIds(c context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		FindOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
+		DockedPlayerMoney(c context.Context, req *player.CreatePlayerTransactionReq) error
+		RollbackTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error
 	}
 
 	paymentRepository struct {

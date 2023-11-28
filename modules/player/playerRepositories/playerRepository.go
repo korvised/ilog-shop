@@ -3,7 +3,10 @@ package playerRepositories
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/modules/models"
+	"github.com/korvised/ilog-shop/modules/payment"
 	"github.com/korvised/ilog-shop/modules/player"
 	"github.com/korvised/ilog-shop/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,18 +25,21 @@ type (
 		FindOnePlayerProfileToRefresh(c context.Context, playerID string) (*player.Player, error)
 		IsUniquePlayer(c context.Context, email, username string) bool
 		InsertOnePlayer(c context.Context, req *player.Player) (primitive.ObjectID, error)
-		InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) error
+		InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) (primitive.ObjectID, error)
 		FindOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
+		DockedPlayerMoneyRes(_ context.Context, req *payment.PaymentTransferRes) error
+		DeleteOnePlayerTransaction(c context.Context, transactionID string) error
 	}
 
 	playerRepository struct {
-		db *mongo.Client
+		db  *mongo.Client
+		cfg *config.Config
 	}
 )
 
-func NewPlayerRepository(db *mongo.Client) PlayerRepositoryService {
-	return &playerRepository{db}
+func NewPlayerRepository(db *mongo.Client, cfg *config.Config) PlayerRepositoryService {
+	return &playerRepository{db, cfg}
 }
 
 func (r *playerRepository) playerDbConn(_ context.Context) *mongo.Database {
@@ -100,9 +106,11 @@ func (r *playerRepository) FindOnePlayerProfile(c context.Context, playerID stri
 	return result, nil
 }
 
-func (r *playerRepository) InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) error {
+func (r *playerRepository) InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) (primitive.ObjectID, error) {
 	ctx, cancel := context.WithTimeout(c, 10*time.Second)
 	defer cancel()
+
+	fmt.Println(req.PlayerID)
 
 	db := r.playerDbConn(ctx)
 	col := db.Collection("player_transactions")
@@ -110,11 +118,11 @@ func (r *playerRepository) InsertOnePlayerTransaction(c context.Context, req *pl
 	result, err := col.InsertOne(ctx, req)
 	if err != nil {
 		log.Printf("Error: InsertOnePlayerTransaction: %v", err)
-		return errors.New("error: insert player transactions failed")
+		return primitive.NilObjectID, errors.New("error: insert player transactions failed")
 	}
 	log.Printf("Result: InsertOnePlayerTransaction: %v", result.InsertedID)
 
-	return nil
+	return result.InsertedID.(primitive.ObjectID), nil
 }
 
 func (r *playerRepository) FindOnePlayerSavingAccount(c context.Context, playerID string) (*player.PlayerSavingAccount, error) {
@@ -139,7 +147,7 @@ func (r *playerRepository) FindOnePlayerSavingAccount(c context.Context, playerI
 				bson.D{
 					{"_id", 0},
 					{"player_id", "$_id"},
-					{"balance", 1},
+					{"balance", bson.D{{"$toDouble", "$balance"}}},
 				},
 			},
 		},
@@ -148,17 +156,21 @@ func (r *playerRepository) FindOnePlayerSavingAccount(c context.Context, playerI
 	cursors, err := col.Aggregate(ctx, filter)
 	if err != nil {
 		log.Printf("Error: FindOnePlayerSavingAccount: %v \n", err)
-		return nil, errors.New("error: find player saving account failed")
+		//return nil, errors.New("error: find player saving account failed")
+		return nil, err
 	}
 
 	result := new(player.PlayerSavingAccount)
 	for cursors.Next(ctx) {
-		if err := cursors.Decode(result); err != nil {
-			log.Printf("Error: FindOnePlayerSavingAccount: %v \n", err)
-			return nil, errors.New("error: find player saving account failed")
+		if err = cursors.Decode(result); err != nil {
+			log.Printf("Error: Decode FindOnePlayerSavingAccount: %v \n", err)
+			//return nil, errors.New("error: find player saving account failed")
+			return nil, err
 		}
 
 	}
+
+	fmt.Println("result", result)
 
 	return result, nil
 }
@@ -224,6 +236,23 @@ func (r *playerRepository) UpsertOffset(c context.Context, offset int64) error {
 		log.Printf("Error: UpsertOffset: %v \n", err)
 		return errors.New("error: upsert player offset failed")
 	}
+
+	return nil
+}
+
+func (r *playerRepository) DeleteOnePlayerTransaction(c context.Context, transactionID string) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.playerDbConn(ctx)
+	col := db.Collection("player_transactions")
+
+	if _, err := col.DeleteOne(ctx, bson.M{"_id": utils.ConvertToObjectId(transactionID)}); err != nil {
+		log.Printf("Error: DeleteOnePlayerTransaction: %s\n", err.Error())
+		return errors.New("error: delete player transaction failed")
+	}
+
+	log.Printf("Delete player transaction %s success", transactionID)
 
 	return nil
 }

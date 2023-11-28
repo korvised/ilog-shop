@@ -2,7 +2,6 @@ package authHandlers
 
 import (
 	"context"
-	"fmt"
 	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/modules/auth"
 	"github.com/korvised/ilog-shop/modules/auth/authUsecases"
@@ -72,8 +71,6 @@ func (h *authHttpHandler) RefreshToken(c echo.Context) error {
 
 	wrapper := request.ContextWrapper(c)
 	req := new(auth.RefreshTokenReq)
-
-	fmt.Println(req)
 
 	if err := wrapper.Bind(req); err != nil {
 		return response.ErrResponse(c, http.StatusBadRequest, err.Error())

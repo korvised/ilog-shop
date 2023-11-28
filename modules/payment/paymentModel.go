@@ -6,7 +6,7 @@ type (
 	}
 
 	ItemServiceReqDatum struct {
-		ItemId string  `json:"item_id" validate:"required,max=64"`
+		ItemID string  `json:"item_id" validate:"required,max=64"`
 		Price  float64 `json:"price"`
 	}
 
@@ -17,11 +17,11 @@ type (
 	}
 
 	PaymentTransferRes struct {
-		InventoryID   string `json:"inventory_id"`
-		TransactionID string `json:"transaction_id"`
-		PlayerID      string `json:"player_id"`
-		ItemID        string `json:"item_id"`
-		Amount        string `json:"amount"`
-		Error         string `json:"error"`
+		InventoryID   string  `json:"inventory_id"`
+		TransactionID string  `json:"transaction_id"`
+		PlayerID      string  `json:"player_id"`
+		ItemID        string  `json:"item_id"`
+		Amount        float64 `json:"amount"`
+		Error         string  `json:"error"`
 	}
 )

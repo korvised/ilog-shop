@@ -99,8 +99,10 @@ func Start(c context.Context, cfg *config.Config, db *mongo.Client) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	// Apply Logger
-	s.app.Use(middleware.Logger())
+	// Set the logging level
+	s.app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} | ${method} | ${uri} | ${status}\n",
+	}))
 
 	go s.graceFullShutdown(c, quit)
 
