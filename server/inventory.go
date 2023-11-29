@@ -28,7 +28,9 @@ func (s *server) inventoryService() {
 
 	// Queue handler
 	go queueHandler.AddPlayerItem()
+	go queueHandler.RemovePlayerItem()
 	go queueHandler.RollbackAddPlayerItem()
+	go queueHandler.RollbackRemovePlayerItem()
 
 	router := s.app.Group("/api/v1")
 

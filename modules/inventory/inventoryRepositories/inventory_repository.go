@@ -23,11 +23,13 @@ type (
 		FindItemInIds(c context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		FindPlayItems(c context.Context, filter primitive.D, opts []*options.FindOptions) ([]*inventory.Inventory, error)
 		CountPlayerItems(c context.Context, filter primitive.D) (int64, error)
+		FindOnePlayerItem(c context.Context, PlayerID, ItemID string) error
 		FindOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
 		AddPlayerItemRes(_ context.Context, req *payment.PaymentTransferRes) error
 		RemovePlayerItemRes(_ context.Context, req *payment.PaymentTransferRes) error
 		DeleteOneInventory(c context.Context, inventoryID string) error
+		DeleteOnePlayerItem(c context.Context, PlayerID, ItemID string) error
 	}
 
 	inventoryRepository struct {
@@ -103,6 +105,22 @@ func (r *inventoryRepository) CountPlayerItems(c context.Context, filter primiti
 	return count, nil
 }
 
+func (r *inventoryRepository) FindOnePlayerItem(c context.Context, PlayerID, ItemID string) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory")
+
+	result := new(inventory.Inventory)
+	if err := col.FindOne(ctx, bson.M{"player_id": PlayerID, "item_id": ItemID}).Decode(result); err != nil {
+		log.Printf("Error: FindOnePlayerItem: %v \n", err)
+		return errors.New("error: player item not found")
+	}
+
+	return nil
+}
+
 func (r *inventoryRepository) FindOffset(c context.Context) (int64, error) {
 	ctx, cancel := context.WithTimeout(c, 10*time.Second)
 	defer cancel()
@@ -143,6 +161,21 @@ func (r *inventoryRepository) DeleteOneInventory(c context.Context, inventoryID 
 	col := db.Collection("players_inventory")
 
 	if _, err := col.DeleteOne(ctx, bson.M{"_id": utils.ConvertToObjectId(inventoryID)}); err != nil {
+		log.Printf("Error: DeleteOnePlayerItem: %s\n", err.Error())
+		return errors.New("error: delete player item failed")
+	}
+
+	return nil
+}
+
+func (r *inventoryRepository) DeleteOnePlayerItem(c context.Context, PlayerID, ItemID string) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory")
+
+	if _, err := col.DeleteOne(ctx, bson.M{"player_id": PlayerID, "item_id": ItemID}); err != nil {
 		log.Printf("Error: DeleteOnePlayerItem: %s\n", err.Error())
 		return errors.New("error: delete player item failed")
 	}

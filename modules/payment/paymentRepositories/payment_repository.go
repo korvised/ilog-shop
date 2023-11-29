@@ -24,6 +24,8 @@ type (
 		RollbackTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error
 		AddPlayItem(c context.Context, req *inventory.UpdateInventoryReq) error
 		RollbackAddPlayItem(c context.Context, req *inventory.RollbackPlayerInventoryReq) error
+		RemovePlayItem(c context.Context, req *inventory.UpdateInventoryReq) error
+		RollbackRemovePlayItem(c context.Context, req *inventory.RollbackPlayerInventoryReq) error
 	}
 
 	paymentRepository struct {

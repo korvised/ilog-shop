@@ -140,5 +140,43 @@ func (u *paymentUsecase) SellItem(c context.Context, playerID string, req *payme
 		return nil, err
 	}
 
-	return nil, nil
+	stage1 := make([]*payment.PaymentTransferRes, 0)
+	for _, obj := range req.Items {
+		_ = u.paymentRepository.RemovePlayItem(c, &inventory.UpdateInventoryReq{
+			PlayerID: playerID,
+			ItemID:   obj.ItemID,
+		})
+
+		resCh := make(chan *payment.PaymentTransferRes)
+
+		go u.BuyOrSellConsumer(c, "sell", resCh)
+
+		res := <-resCh
+		if res != nil {
+			utils.Debug(res, "stage1 res:")
+			stage1 = append(stage1, &payment.PaymentTransferRes{
+				InventoryID:   "",
+				TransactionID: "",
+				PlayerID:      playerID,
+				ItemID:        obj.ItemID,
+				Amount:        obj.Price,
+				Error:         res.Error,
+			})
+		}
+	}
+
+	// Rollback transaction
+	for _, obj := range stage1 {
+		if obj.Error != "" {
+			log.Println("BuyOrSellConsumer stage1 error: ", obj)
+			_ = u.paymentRepository.RollbackRemovePlayItem(c, &inventory.RollbackPlayerInventoryReq{
+				PlayerID: playerID,
+				ItemID:   obj.ItemID,
+			})
+
+			return nil, errors.New("error: sell item failed")
+		}
+	}
+
+	return stage1, nil
 }

@@ -38,7 +38,7 @@ func (r *paymentRepository) RollbackTransaction(_ context.Context, req *player.R
 	reqInBytes, err := json.Marshal(req)
 	if err != nil {
 		log.Printf("Payment Error: RollbackTransaction: %s\n", err.Error())
-		return errors.New("error: rollback player money failed")
+		return errors.New("error: rollback player transaction failed")
 	}
 
 	log.Printf("Payment Info: RollbackTransaction: %s\n", string(reqInBytes))
@@ -52,7 +52,7 @@ func (r *paymentRepository) RollbackTransaction(_ context.Context, req *player.R
 		reqInBytes,
 	); err != nil {
 		log.Printf("Error: RollbackTransaction: %s\n", err.Error())
-		return errors.New("error: rollback player money failed")
+		return errors.New("error: rollback player transaction failed")
 	}
 
 	return nil
@@ -99,8 +99,56 @@ func (r *paymentRepository) RollbackAddPlayItem(_ context.Context, req *inventor
 		"rollback_buy",
 		reqInBytes,
 	); err != nil {
-		log.Printf("Error: RollbackTransaction: %s\n", err.Error())
+		log.Printf("Error: RollbackAddPlayItem: %s\n", err.Error())
 		return errors.New("error: rollback add player item failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RemovePlayItem(_ context.Context, req *inventory.UpdateInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Payment Error: RemovePlayItem: %s\n", err.Error())
+		return errors.New("error: remove player item failed")
+	}
+
+	log.Printf("Payment Info: RemovePlayItem: %s\n", string(reqInBytes))
+
+	if err = queue.PushMessageWithKeyToQueue(
+		[]string{r.cfg.Kafka.Url},
+		r.cfg.Kafka.ApiKey,
+		r.cfg.Kafka.Secret,
+		"inventory",
+		"sell",
+		reqInBytes,
+	); err != nil {
+		log.Printf("Error: RemovePlayItem: %s\n", err.Error())
+		return errors.New("error: remove player item failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RollbackRemovePlayItem(_ context.Context, req *inventory.RollbackPlayerInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Payment Error: RollbackRemovePlayItem: %s\n", err.Error())
+		return errors.New("error: rollback remove player item failed")
+	}
+
+	log.Printf("Payment Info: RollbackRemovePlayItem: %s\n", string(reqInBytes))
+
+	if err = queue.PushMessageWithKeyToQueue(
+		[]string{r.cfg.Kafka.Url},
+		r.cfg.Kafka.ApiKey,
+		r.cfg.Kafka.Secret,
+		"inventory",
+		"rollback_sell",
+		reqInBytes,
+	); err != nil {
+		log.Printf("Error: RollbackRemovePlayItem: %s\n", err.Error())
+		return errors.New("error: rollback remove player item failed")
 	}
 
 	return nil
