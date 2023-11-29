@@ -28,7 +28,7 @@ func (r *inventoryRepository) FindItemInIds(c context.Context, req *itemPb.FindI
 	}
 
 	if result == nil || result.Items == nil || len(result.Items) == 0 {
-		log.Println("Error: FindItemInIds: result is nil or empty")
+		log.Println("Error FindItemInIds: result is nil or empty")
 		return nil, errors.New("error: item not found")
 	}
 

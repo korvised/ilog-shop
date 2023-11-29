@@ -3,7 +3,6 @@ package playerRepositories
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/korvised/ilog-shop/config"
 	"github.com/korvised/ilog-shop/modules/models"
 	"github.com/korvised/ilog-shop/modules/payment"
@@ -109,8 +108,6 @@ func (r *playerRepository) FindOnePlayerProfile(c context.Context, playerID stri
 func (r *playerRepository) InsertOnePlayerTransaction(c context.Context, req *player.PlayerTransaction) (primitive.ObjectID, error) {
 	ctx, cancel := context.WithTimeout(c, 10*time.Second)
 	defer cancel()
-
-	fmt.Println(req.PlayerID)
 
 	db := r.playerDbConn(ctx)
 	col := db.Collection("player_transactions")

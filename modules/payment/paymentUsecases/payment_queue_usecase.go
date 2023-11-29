@@ -5,6 +5,7 @@ import (
 	"github.com/korvised/ilog-shop/modules/payment"
 	"github.com/korvised/ilog-shop/modules/player"
 	"github.com/korvised/ilog-shop/pkg/queue"
+	"github.com/korvised/ilog-shop/pkg/utils"
 	"log"
 )
 
@@ -58,7 +59,7 @@ func (u *paymentUsecase) BuyItem(c context.Context, playerID string, req *paymen
 
 		res := <-resCh
 		if res != nil {
-			log.Println("BuyOrSellConsumer res: ", res)
+			utils.Debug(res)
 			stage1 = append(stage1, &payment.PaymentTransferRes{
 				InventoryID:   "",
 				TransactionID: res.TransactionID,
@@ -71,7 +72,6 @@ func (u *paymentUsecase) BuyItem(c context.Context, playerID string, req *paymen
 	}
 
 	for _, obj := range stage1 {
-
 		if obj.Error != "" {
 			log.Println("BuyOrSellConsumer error: ", obj)
 			for _, s1 := range stage1 {
