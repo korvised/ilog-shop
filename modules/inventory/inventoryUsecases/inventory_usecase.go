@@ -20,6 +20,10 @@ type (
 		GetPlayerItems(c context.Context, playerID string, req *inventory.InventorySearchReq) (*models.PaginateRes, error)
 		GetOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
+		AddPlayerItemRes(c context.Context, req *inventory.UpdateInventoryReq)
+		RemovePlayerItemRes(c context.Context, req *inventory.UpdateInventoryReq)
+		RollbackAddPlayerItem(c context.Context, req *inventory.RollbackPlayerInventoryReq)
+		RollbackRemovePlayerItem(c context.Context, req *inventory.RollbackPlayerInventoryReq)
 	}
 
 	inventoryUsecase struct {

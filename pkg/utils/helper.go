@@ -7,8 +7,11 @@ import (
 	"time"
 )
 
-func Debug(obj any) {
+func Debug(obj any, msg ...string) {
 	raw, _ := json.MarshalIndent(obj, "", "\t")
+	for _, m := range msg {
+		fmt.Println(m)
+	}
 	fmt.Println(string(raw))
 }
 

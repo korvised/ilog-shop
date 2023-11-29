@@ -7,6 +7,8 @@ import (
 	"github.com/korvised/ilog-shop/modules/inventory"
 	itemPb "github.com/korvised/ilog-shop/modules/item/itemPb"
 	"github.com/korvised/ilog-shop/modules/models"
+	"github.com/korvised/ilog-shop/modules/payment"
+	"github.com/korvised/ilog-shop/pkg/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,11 +19,15 @@ import (
 
 type (
 	InventoryRepositoryService interface {
+		InsertOnePlayerItem(c context.Context, req *inventory.Inventory) (primitive.ObjectID, error)
 		FindItemInIds(c context.Context, req *itemPb.FindItemsInIdsReq) (*itemPb.FindItemsInIdsRes, error)
 		FindPlayItems(c context.Context, filter primitive.D, opts []*options.FindOptions) ([]*inventory.Inventory, error)
 		CountPlayerItems(c context.Context, filter primitive.D) (int64, error)
 		FindOffset(c context.Context) (int64, error)
 		UpsertOffset(c context.Context, offset int64) error
+		AddPlayerItemRes(_ context.Context, req *payment.PaymentTransferRes) error
+		RemovePlayerItemRes(_ context.Context, req *payment.PaymentTransferRes) error
+		DeleteOneInventory(c context.Context, inventoryID string) error
 	}
 
 	inventoryRepository struct {
@@ -36,6 +42,22 @@ func NewInventoryRepository(db *mongo.Client, cfg *config.Config) InventoryRepos
 
 func (r *inventoryRepository) inventoryDbConn(_ context.Context) *mongo.Database {
 	return r.db.Database("inventory_db")
+}
+
+func (r *inventoryRepository) InsertOnePlayerItem(c context.Context, req *inventory.Inventory) (primitive.ObjectID, error) {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory")
+
+	result, err := col.InsertOne(ctx, req)
+	if err != nil {
+		log.Printf("Error: InsertOnePlayerItem: %s\n", err.Error())
+		return primitive.NilObjectID, errors.New("error: insert player item failed")
+	}
+
+	return result.InsertedID.(primitive.ObjectID), nil
 }
 
 func (r *inventoryRepository) FindPlayItems(c context.Context, filter primitive.D, opts []*options.FindOptions) ([]*inventory.Inventory, error) {
@@ -108,6 +130,21 @@ func (r *inventoryRepository) UpsertOffset(c context.Context, offset int64) erro
 	if err != nil {
 		log.Printf("Error: UpsertOffset: %v \n", err)
 		return errors.New("error: upsert inventory offset failed")
+	}
+
+	return nil
+}
+
+func (r *inventoryRepository) DeleteOneInventory(c context.Context, inventoryID string) error {
+	ctx, cancel := context.WithTimeout(c, 10*time.Second)
+	defer cancel()
+
+	db := r.inventoryDbConn(ctx)
+	col := db.Collection("players_inventory")
+
+	if _, err := col.DeleteOne(ctx, bson.M{"_id": utils.ConvertToObjectId(inventoryID)}); err != nil {
+		log.Printf("Error: DeleteOnePlayerItem: %s\n", err.Error())
+		return errors.New("error: delete player item failed")
 	}
 
 	return nil

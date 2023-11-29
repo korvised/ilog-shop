@@ -113,7 +113,7 @@ func (h *playerQueueHandler) RollbackPlayerTransaction() {
 			log.Printf("Error: RollbackPlayerTransaction: %v \n", err)
 			continue
 		case msg := <-consumer.Messages():
-			if string(msg.Key) != "rtransaction" {
+			if string(msg.Key) != "rollback_buy" {
 				if err = h.playerUsecase.UpsertOffset(ctx, msg.Offset+1); err != nil {
 					continue
 				}

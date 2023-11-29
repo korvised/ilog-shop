@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/korvised/ilog-shop/config"
+	"github.com/korvised/ilog-shop/modules/inventory"
 	itemPb "github.com/korvised/ilog-shop/modules/item/itemPb"
 	"github.com/korvised/ilog-shop/modules/models"
 	"github.com/korvised/ilog-shop/modules/player"
@@ -21,6 +22,8 @@ type (
 		UpsertOffset(c context.Context, offset int64) error
 		DockedPlayerMoney(c context.Context, req *player.CreatePlayerTransactionReq) error
 		RollbackTransaction(c context.Context, req *player.RollbackPlayerTransactionReq) error
+		AddPlayItem(c context.Context, req *inventory.UpdateInventoryReq) error
+		RollbackAddPlayItem(c context.Context, req *inventory.RollbackPlayerInventoryReq) error
 	}
 
 	paymentRepository struct {

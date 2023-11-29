@@ -96,8 +96,8 @@ func (u *playerUsecase) AddPlayerMoney(c context.Context, req *player.CreatePlay
 	return u.GetPlayerSavingAccount(c, req.PlayerID)
 }
 
-func (u *playerUsecase) GetPlayerSavingAccount(c context.Context, playerId string) (*player.PlayerSavingAccount, error) {
-	return u.playerRepository.FindOnePlayerSavingAccount(c, playerId)
+func (u *playerUsecase) GetPlayerSavingAccount(c context.Context, playerID string) (*player.PlayerSavingAccount, error) {
+	return u.playerRepository.FindOnePlayerSavingAccount(c, playerID)
 }
 
 func (u *playerUsecase) GetOffset(c context.Context) (int64, error) {

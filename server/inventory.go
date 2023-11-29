@@ -26,8 +26,9 @@ func (s *server) inventoryService() {
 		_ = grpcServer.Serve(lis)
 	}()
 
-	_ = httpHandler
-	_ = queueHandler
+	// Queue handler
+	go queueHandler.AddPlayerItem()
+	go queueHandler.RollbackAddPlayerItem()
 
 	router := s.app.Group("/api/v1")
 

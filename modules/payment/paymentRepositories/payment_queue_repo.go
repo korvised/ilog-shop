@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/korvised/ilog-shop/modules/inventory"
 	"github.com/korvised/ilog-shop/modules/player"
 	"github.com/korvised/ilog-shop/pkg/queue"
 	"log"
@@ -47,11 +48,59 @@ func (r *paymentRepository) RollbackTransaction(_ context.Context, req *player.R
 		r.cfg.Kafka.ApiKey,
 		r.cfg.Kafka.Secret,
 		"player",
-		"rtransaction",
+		"rollback_buy",
 		reqInBytes,
 	); err != nil {
 		log.Printf("Error: RollbackTransaction: %s\n", err.Error())
 		return errors.New("error: rollback player money failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) AddPlayItem(_ context.Context, req *inventory.UpdateInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Payment Error: AddPlayItem: %s\n", err.Error())
+		return errors.New("error: add player item failed")
+	}
+
+	log.Printf("Payment Info: AddPlayItem: %s\n", string(reqInBytes))
+
+	if err = queue.PushMessageWithKeyToQueue(
+		[]string{r.cfg.Kafka.Url},
+		r.cfg.Kafka.ApiKey,
+		r.cfg.Kafka.Secret,
+		"inventory",
+		"buy",
+		reqInBytes,
+	); err != nil {
+		log.Printf("Error: AddPlayItem: %s\n", err.Error())
+		return errors.New("error: add player item failed")
+	}
+
+	return nil
+}
+
+func (r *paymentRepository) RollbackAddPlayItem(_ context.Context, req *inventory.RollbackPlayerInventoryReq) error {
+	reqInBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Printf("Payment Error: RollbackAddPlayItem: %s\n", err.Error())
+		return errors.New("error: rollback add player item failed")
+	}
+
+	log.Printf("Payment Info: RollbackAddPlayItem: %s\n", string(reqInBytes))
+
+	if err = queue.PushMessageWithKeyToQueue(
+		[]string{r.cfg.Kafka.Url},
+		r.cfg.Kafka.ApiKey,
+		r.cfg.Kafka.Secret,
+		"inventory",
+		"rollback_buy",
+		reqInBytes,
+	); err != nil {
+		log.Printf("Error: RollbackTransaction: %s\n", err.Error())
+		return errors.New("error: rollback add player item failed")
 	}
 
 	return nil
